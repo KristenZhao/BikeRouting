@@ -1,11 +1,23 @@
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0px;
+}
 /* Always set the map height explicitly to define the size of the div
  * element that contains the map. */
  #header {
    height: 7%;
    position: absolute;
    width: 100%;
-   background-color: #aaaaaa;
+   background-color: #920727;
    top:0px;
+   padding-left: 5px;
+ }
+
+ #header>h2 {
+   color: #eeeeee;
+   margin: 2px;
+   /*font-family: Roboto;*/
  }
 
 #map {
@@ -39,6 +51,9 @@
   bottom: 0px;
 }
 
+#sidebar>p {
+  padding-left: 5px;
+}
 
 .controls {
   margin-top: 10px;
@@ -61,10 +76,10 @@
   margin-left: 12px;
   padding: 0 11px 0 13px;
   text-overflow: ellipsis;
-  width: 200px;
-  left: 5%;
+  width: 90%;
+  left: 2%;
   /*height: 100px;*/
-  top: 200px;
+  top: 50px;
   position: absolute;
 }
 #destination-input {
@@ -75,10 +90,10 @@
   margin-left: 12px;
   padding: 0 11px 0 13px;
   text-overflow: ellipsis;
-  width: 200px;
-  left: 5%;
+  width: 90%;
+  left: 2%;
   /*height: 200px;*/
-  top: 250px;
+  top: 90px;
   position: absolute;
 }
 

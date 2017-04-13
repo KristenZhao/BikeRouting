@@ -77,14 +77,20 @@ function AutocompleteDirectionsHandler(map) {
         this.directionsService.route({
           origin: {'placeId': this.originPlaceId},
           destination: {'placeId': this.destinationPlaceId},
-          travelMode: this.travelMode
+          travelMode: this.travelMode,
+          provideRouteAlternatives: true
         }, function(response, status) {
           if (status === 'OK') {
             me.directionsDisplay.setDirections(response);
-            console.log('setDirections:',me.directionsDisplay.setDirections(response));
             console.log('display:',me.directionsDisplay);
+            var route1 = me.directionsDisplay.directions.routes[0].overview_polyline;
+            console.log('route1:',route1);
+            console.log('decoded:',decode(route1));
           } else {
             window.alert('Directions request failed due to ' + status);
           }
         });
       };
+
+      //console.log('display2:',me.directionsDisplay);
+      // decode()
