@@ -83,9 +83,13 @@ function AutocompleteDirectionsHandler(map) {
           if (status === 'OK') {
             me.directionsDisplay.setDirections(response);
             console.log('display:',me.directionsDisplay);
-            var route1 = me.directionsDisplay.directions.routes[0].overview_polyline;
-            console.log('route1:',route1);
-            console.log('decoded:',decode(route1));
+            // Convert polyline into points and put into one array
+            console.log(me.directionsDisplay.directions.routes.length);
+            var route_points = [];
+            _.each(me.directionsDisplay.directions.routes,function(route){
+              route_points.push(decode(route.overview_polyline));
+            });
+            console.log(route_points);
           } else {
             window.alert('Directions request failed due to ' + status);
           }
