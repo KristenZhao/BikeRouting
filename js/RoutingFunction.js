@@ -90,6 +90,7 @@ AutocompleteDirectionsHandler.prototype.route = function() {
       var start = "LINESTRING(";
       var end = ")";
       var join = ", ";
+      // create a function to convert route codes into well-known texts
       var wkt_conversion = function(route){
         route_decoded = decode(route.overview_polyline);
         middle = _.map(route_decoded,function(d){
@@ -98,17 +99,31 @@ AutocompleteDirectionsHandler.prototype.route = function() {
         route_wktstring.push(wkt);
       };
       _.each(me.directionsDisplay.directions.routes,wkt_conversion);
-      console.log(route_wktstring[0]);
+      console.log('route_wktstring.length',route_wktstring.length);
       //// carto SQL query desired rows
-      var cartoUserName = 'KristenZhao';
-      var sql = 'select * from laneconnslopectrlcrash_score_2 as L where ST_DWithin(ST_GeomFromText(\'' +
-      route_wktstring[0] + '\')::geography,L.the_geom::geography,10)';
-      var format = "GeoJSON";
-      var url = "https://"+cartoUserName+".carto.com/api/v2/sql?format="+format+"&q="+sql;
-      console.log(url);
-      $.ajax(url).done(function(data){
-        console.log(data);
-      });
+      var scoreArray = [];
+      var getRouteScore = function(wktstring){
+        var cartoUserName = 'KristenZhao';
+        var sql = 'select * from laneconnslopectrlcrash_score_2 as L where ST_DWithin(ST_GeomFromText(\'' +
+        wktstring + '\')::geography,st_centroid(L.the_geom)::geography,5)';
+        var format = "GeoJSON";
+        var url = "https://"+cartoUserName+".carto.com/api/v2/sql?format="+format+"&q="+sql;
+        // Start query and score calculation
+        $.ajax(url).done(function(data){
+          //console.log('data:',data);
+          //console.log('finalscore1:',data.features[0].properties.finalscore);
+          var sumscore = _.reduce(data.features, function(memo,i){
+            return memo+i.properties.finalscore;}, 0);
+          //console.log('sumscore',sumscore);
+          //console.log('data length',data.features.length);
+          var avgscore = Math.round(sumscore/data.features.length);
+          //console.log('avgscore',avgscore);
+          scoreArray.push(avgscore);
+        });
+      };
+     _.each(route_wktstring,getRouteScore);
+     console.log('scoreArray',scoreArray);
+     
     } //// Error handling:
       else {
       window.alert('Directions request failed due to ' + status);
