@@ -9,7 +9,6 @@ function initMap() {
   });
   new AutocompleteDirectionsHandler(map);
 }
-
 // hide route option panels
 $( "#option1" ).hide();
 $( "#option2" ).hide();
@@ -17,44 +16,24 @@ $( "#option3" ).hide();
 
 //</script>
 function AutocompleteDirectionsHandler(map) {
-      this.map = map;
-      this.originPlaceId = null;
-      this.destinationPlaceId = null;
-      this.travelMode = 'BICYCLING';
-      var originInput = document.getElementById('origin-input');
-      var destinationInput = document.getElementById('destination-input');
-      var modeSelector = document.getElementById('mode-selector');
-      this.directionsService = new google.maps.DirectionsService();
-      this.directionsDisplay = new google.maps.DirectionsRenderer();
-      this.directionsDisplay.setMap(map);
+  this.map = map;
+  this.originPlaceId = null;
+  this.destinationPlaceId = null;
+  this.travelMode = 'BICYCLING';
+  var originInput = document.getElementById('origin-input');
+  var destinationInput = document.getElementById('destination-input');
+  var modeSelector = document.getElementById('mode-selector');
+  this.directionsService = new google.maps.DirectionsService();
+  this.directionsDisplay = new google.maps.DirectionsRenderer();
+  this.directionsDisplay.setMap(map);
 
-      var originAutocomplete = new google.maps.places.Autocomplete(
-          originInput, {placeIdOnly: true});
-      var destinationAutocomplete = new google.maps.places.Autocomplete(
-          destinationInput, {placeIdOnly: true});
-      //
-      // this.setupClickListener('changemode-biking', 'BICYCLING');
-      // this.setupClickListener('changemode-transit', 'TRANSIT');
-      // this.setupClickListener('changemode-driving', 'DRIVING');
-
-      this.setupPlaceChangedListener(originAutocomplete, 'ORIG');
-      this.setupPlaceChangedListener(destinationAutocomplete, 'DEST');
-
-      // this.map.controls[google.maps.ControlPosition.TOP_LEFT].push(originInput);
-      // this.map.controls[google.maps.ControlPosition.TOP_LEFT].push(destinationInput);
-      //this.map.controls[google.maps.ControlPosition.TOP_LEFT].push(modeSelector);
+  var originAutocomplete = new google.maps.places.Autocomplete(
+      originInput, {placeIdOnly: true});
+  var destinationAutocomplete = new google.maps.places.Autocomplete(
+      destinationInput, {placeIdOnly: true});
+  this.setupPlaceChangedListener(originAutocomplete, 'ORIG');
+  this.setupPlaceChangedListener(destinationAutocomplete, 'DEST');
 }
-
-// Sets a listener on a radio button to change the filter type on Places
-// Autocomplete.
-// AutocompleteDirectionsHandler.prototype.setupClickListener = function(id, mode) {
-//   var radioButton = document.getElementById(id);
-//   var me = this;
-//   radioButton.addEventListener('click', function() {
-//     me.travelMode = mode;
-//     me.route();
-//   });
-// };
 
 AutocompleteDirectionsHandler.prototype.setupPlaceChangedListener = function(autocomplete, mode) {
   var me = this;
@@ -89,9 +68,9 @@ AutocompleteDirectionsHandler.prototype.route = function() {
   }, function(response, status) {
     if (status === 'OK') {
       me.directionsDisplay.setDirections(response);
-      console.log('display:',me.directionsDisplay);
+      //console.log('display:',me.directionsDisplay);
       //// Convert polyline into points and put into one array
-      console.log(me.directionsDisplay.directions.routes.length);
+      //console.log(me.directionsDisplay.directions.routes.length);
       var route_wktstring = [];
       var start = "LINESTRING(";
       var end = ")";
@@ -107,7 +86,7 @@ AutocompleteDirectionsHandler.prototype.route = function() {
       _.each(me.directionsDisplay.directions.routes,wkt_conversion);
       console.log('route_wktstring.length',route_wktstring.length);
       //// carto SQL query desired rows
-      var scoreArray = [];
+      var scoreArray = new Array();
       var getRouteScore = function(wktstring){
         var cartoUserName = 'KristenZhao';
         var sql = 'select * from laneconnslopectrlcrash_score_2 as L where ST_DWithin(ST_GeomFromText(\'' +
@@ -123,17 +102,50 @@ AutocompleteDirectionsHandler.prototype.route = function() {
           //console.log('sumscore',sumscore);
           //console.log('data length',data.features.length);
           var avgscore = Math.round(sumscore/data.features.length);
-          //console.log('avgscore',avgscore);
+          console.log('avgscore',avgscore);
           scoreArray.push(avgscore);
+          //return avgscore;
         });
       };
-     _.each(route_wktstring,getRouteScore);
-     console.log('scoreArray',scoreArray);
+    _.each(route_wktstring,getRouteScore);
+     //setTimeout(function(){console.log(scoreArray)},2000);
+     console.log(scoreArray[1]);
+     console.log(me.directionsDisplay.directions.routes[0].summary);
+     console.log(me.directionsDisplay.directions.routes[0].legs[0].distance.text);
 
      //Setting direction display
-     for(i=0; i< me.directionsDisplay.directions.routes.length;i++){
-       
-     }
+     setTimeout(function(){
+       for(i=0; i< me.directionsDisplay.directions.routes.length;i++){
+         var num = i+1;
+         var options = '#option'.concat(num.toString());
+        //  console.log('num:',num);
+        //  console.log('option'.concat(num.toString()));
+         $(options).show();
+         $(options.concat(' h6')).text(
+           ('via '.concat(me.directionsDisplay.directions.routes[i].summary))
+         );
+         $(options.concat(' > div.mdl-grid > div:nth-child(2)')).text(
+           me.directionsDisplay.directions.routes[i].legs[0].distance.text
+         );
+         $(options.concat(' > div.mdl-grid > div:nth-child(3)')).text(
+           me.directionsDisplay.directions.routes[i].legs[0].duration.text
+         );
+         $(options.concat(' > div:nth-child(3) > div > h4')).text(
+           scoreArray[i].toString()
+         );
+        // asynchro
+       }
+     },4000);
+     // set event listener
+     $('.controls').on('click',function(e){
+       for(i=0; i< me.directionsDisplay.directions.routes.length;i++){
+         var num = i+1;
+         var options2 = '#option'.concat(num.toString());
+         //console.log(options2);
+         $(options2).hide();
+       }
+     });
+
 
     } //// Error handling:
       else {
