@@ -9,39 +9,31 @@ html, body {
    height: 10%;
    position: absolute;
    width: 100%;
-   background-color: #2196F3;
+   background-color: #0D47A1;
    top:0px;
    padding-left: 5px;
  }
 
- #header>h2 {
-   color: #eeeeee;
-   margin: 2px;
-   /*font-family: Roboto;*/
- }
-
 .fa-github {
-  color: #000000;
+  color: #eeeeee;
   position: absolute;
-  top: 5px;
+  top: 5%;
   right: 10px;
-  /*top: 5px !important;*/
 }
+
 #map {
-  height: 90%;
-  width: 70%;
+  height: 100%;
+  width: 100%;
   position:absolute;
   right:0;
   border:0px;
   bottom: 0px;
-  /*background-color: #000000;*/
+  background-color: #000000;
 }
-/* Optional: Makes the sample page fill the window. */
-/*html, body {
-  height: 100%;
-  margin: 0;
-  padding: 0;
-}*/
+
+.mdl-layout-title {
+  margin-left: -15px;
+}
 /*#user-input {
   height:100%;
   width:30%;
@@ -50,17 +42,20 @@ html, body {
   padding: 10px 0px 0px 10px;
 }*/
 
-#sidebar {
+/*#sidebar {
   width: 30%;
   height: 90%;
   position:absolute;
   left: 0;
   bottom: 0px;
-}
+  background-color: #1E88E5;
+}*/
 
-#sidebar>p {
+/*#sidebar>p {
   padding-left: 5px;
-}
+  font-size: 18px;
+  color: #eeeeee;
+}*/
 
 .controls {
   margin-top: 10px;
@@ -75,6 +70,39 @@ html, body {
   /*z-index: 2000px;*/
 }
 
+#oi-controls {
+  margin-bottom: 85px;
+}
+.route-option {
+  width: 90%;
+  height: 140px;
+  /*position: */
+  align-self: center;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+  background-color: #80CBC4;
+  margin-bottom: 15px;
+  position: static;
+  clear: both;
+}
+
+/*#option1 {
+  top:230px;
+  position: absolute;
+}*/
+
+.route-title {
+  margin: 8px 8px 16px;
+}
+/*#option2 {
+  top:390px;
+  position: absolute;
+}*/
+
+/*#option3 {
+  top:550px;
+  position: absolute;
+}*/
+
 #origin-input {
   background-color: #fff;
   font-family: Roboto;
@@ -84,8 +112,7 @@ html, body {
   padding: 0 11px 0 13px;
   text-overflow: ellipsis;
   width: 90%;
-  left: 2%;
-  /*height: 100px;*/
+  align-self: center;
   top: 50px;
   position: absolute;
 }
@@ -95,12 +122,12 @@ html, body {
   font-size: 15px;
   font-weight: 300;
   margin-left: 12px;
+  margin-bottom: 30px;
   padding: 0 11px 0 13px;
   text-overflow: ellipsis;
   width: 90%;
-  left: 2%;
-  /*height: 200px;*/
-  top: 90px;
+  align-self: center;
+  top: 95px;
   position: absolute;
 }
 
@@ -108,16 +135,3 @@ html, body {
 #destination-input:focus {
   border-color: #4d90fe;
 }
-
-/*#mode-selector {
-  color: #fff;
-  background-color: #4d90fe;
-  margin-left: 12px;
-  padding: 5px 11px 0px 11px;
-}
-
-#mode-selector label {
-  font-family: Roboto;
-  font-size: 13px;
-  font-weight: 300;
-}*/

@@ -1,13 +1,19 @@
 // Load the google map
 //<script>
+
 var map;
 function initMap() {
   map = new google.maps.Map(document.getElementById('map'), {
-    center: {lat: 40.000, lng: -75.1639},
+    center: {lat: 39.996926, lng: -75.21183},
     zoom: 11
   });
   new AutocompleteDirectionsHandler(map);
 }
+
+// hide route option panels
+$( "#option1" ).hide();
+$( "#option2" ).hide();
+$( "#option3" ).hide();
 
 //</script>
 function AutocompleteDirectionsHandler(map) {
@@ -123,7 +129,12 @@ AutocompleteDirectionsHandler.prototype.route = function() {
       };
      _.each(route_wktstring,getRouteScore);
      console.log('scoreArray',scoreArray);
-     
+
+     //Setting direction display
+     for(i=0; i< me.directionsDisplay.directions.routes.length;i++){
+       
+     }
+
     } //// Error handling:
       else {
       window.alert('Directions request failed due to ' + status);
