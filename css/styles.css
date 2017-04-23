@@ -113,3 +113,8 @@ html, body {
 #destination-input:focus {
   border-color: #4d90fe;
 }
+
+.fa-github {
+  position: absolute;
+  top: 10px;
+}
