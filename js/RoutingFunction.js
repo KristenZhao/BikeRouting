@@ -86,25 +86,32 @@ AutocompleteDirectionsHandler.prototype.route = function() {
       _.each(me.directionsDisplay.directions.routes,wkt_conversion);
       console.log('route_wktstring.length',route_wktstring.length);
       //// carto SQL query desired rows
-      var scoreArray = new Array();
+      var scoreArray = [];
       var getRouteScore = function(wktstring){
         var cartoUserName = 'KristenZhao';
-        var sql = 'select * from laneconnslopectrlcrash_score_2 as L where ST_DWithin(ST_GeomFromText(\'' +
+        var sql = 'select * from allscore_length as L where ST_DWithin(ST_GeomFromText(\'' +
         wktstring + '\')::geography,st_centroid(L.the_geom)::geography,5)';
         var format = "GeoJSON";
         var url = "https://"+cartoUserName+".carto.com/api/v2/sql?format="+format+"&q="+sql;
+        console.log('sql:',sql);
         // Start query and score calculation
         $.ajax(url).done(function(data){
-          //console.log('data:',data);
-          //console.log('finalscore1:',data.features[0].properties.finalscore);
-          var sumscore = _.reduce(data.features, function(memo,i){
-            return memo+i.properties.finalscore;}, 0);
-          //console.log('sumscore',sumscore);
-          //console.log('data length',data.features.length);
-          var avgscore = Math.round(sumscore/data.features.length);
+          console.log('data:',data);
+          console.log('length:',data.features[0].properties.lengthft);
+          var sumlength = _.reduce(data.features, function(memo,i) {
+            return memo+i.properties.lengthft;}, 0);
+          _.each(data.features, function(iteratee){
+            iteratee.properties.weightedScore =
+            Math.round(iteratee.properties.lengthft/sumlength*iteratee.properties.finalscore);
+          });
+          // console.log('weightedScore:',weightedScore);
+          var avgscore = _.reduce(data.features, function(memo,i){
+            return memo+i.properties.weightedScore;}, 0);
+          // console.log('sumlength',sumlength);
+          console.log('data length',data.features.length);
           console.log('avgscore',avgscore);
           scoreArray.push(avgscore);
-          //return avgscore;
+          return avgscore;
         });
       };
     _.each(route_wktstring,getRouteScore);
