@@ -5,13 +5,60 @@ html, body {
 }
 /* Always set the map height explicitly to define the size of the div
  * element that contains the map. */
- #header {
-   height: 10%;
-   position: absolute;
-   width: 100%;
-   background-color: #0D47A1;
-   top:0px;
-   padding-left: 5px;
+ .sidenav {
+     height: 90%;
+     width: 0;
+     position: fixed;
+     z-index: 1;
+     top: 0;
+     left: 0;
+     background-color: #F5F5F5;
+     overflow-x: hidden;
+     /*overflow-y: scroll;*/
+     transition: 0.5s;
+     padding-top: 60px;
+     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+ }
+
+ .sidenav a {
+     padding: 8px 8px 8px 32px;
+     text-decoration: none;
+     font-size: 25px;
+     color: #818181;
+     display: block;
+     transition: 0.3s;
+ }
+
+.sidenav span {
+  position: absolute;
+  top: 0px;
+  font-size: 25px;
+  color: #616161;
+  padding: 16px 10px;
+  font-family: Roboto;
+}
+ .sidenav a:hover, .offcanvas a:focus{
+     color: #f1f1f1;
+ }
+
+ .sidenav .closebtn {
+     position: absolute;
+     top: 0;
+     right: 0px;
+     font-size: 30px;
+     /*margin-left: 50px;*/
+ }
+
+ #main {
+     transition: margin-left .5s;
+     padding: 16px;
+     background-color: #009688;
+     height: 23px;
+ }
+
+ @media screen and (max-height: 450px) {
+   .sidenav {padding-top: 15px;}
+   .sidenav a {font-size: 18px;}
  }
 
 .fa-github {
@@ -22,7 +69,7 @@ html, body {
 }
 
 #map {
-  height: 100%;
+  top: 55px;
   width: 100%;
   position:absolute;
   right:0;
@@ -51,35 +98,21 @@ html, body {
 #oi-controls {
   margin-bottom: 85px;
 }
+
 .route-option {
   width: 90%;
   height: auto;
-  /*position: */
-  align-self: center;
+  /*align-content: center;*/
   box-shadow: 0 2px 6px rgba(0,0,0,0.3);
   background-color: #80CBC4;
-  margin-bottom: 15px;
+  margin: 12px;
   position: static;
   clear: both;
 }
 
-/*#option1 {
-  top:230px;
-  position: absolute;
-}*/
-
 .route-title {
   margin: 8px 8px 16px;
 }
-/*#option2 {
-  top:390px;
-  position: absolute;
-}*/
-
-/*#option3 {
-  top:550px;
-  position: absolute;
-}*/
 
 #origin-input {
   background-color: #fff;
