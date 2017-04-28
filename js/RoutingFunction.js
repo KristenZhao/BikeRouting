@@ -54,71 +54,61 @@ AutocompleteDirectionsHandler.prototype.setupPlaceChangedListener = function(aut
 
 };
 
+var getRouteScore = function(wktStrings, scoreArray) {
+  // Start query and score calculation
+  var urls = _.map(wktStrings, function(wkt) {
+    var sql = 'select * from allscore_length as L where ST_DWithin(ST_GeomFromText(\'' +
+    wkt + '\')::geography,st_centroid(L.the_geom)::geography,5)';
+    return "https://KristenZhao.carto.com/api/v2/sql?format=GeoJSON&q="+sql;
+  });
+
+  $(urls).each(function(idx, url) {
+    $.getJSON(url).done(function(data) {
+      var sumlength = _.reduce(data.features, function(memo,i) {
+        return memo + i.properties.lengthft;
+      },  0);
+      _.each(data.features, function(iteratee){
+        iteratee.properties.weightedScore = Math.round(iteratee.properties.lengthft / sumlength * iteratee.properties.finalscore);
+      });
+      var avgscore = _.reduce(data.features, function(memo,i){
+        return memo + i.properties.weightedScore;
+      }, 0);
+
+      scoreArray.push(avgscore);
+      console.log("avgScore: ", avgscore);
+      return avgscore;
+    });
+  });
+};
+
+var wkt_conversion = function(route){
+  var start = "LINESTRING(";
+  var end = ")";
+  var join = ", ";
+  var route_decoded = decode(route.overview_polyline);
+  var middle = _.map(route_decoded, function(d) {
+    return (d.longitude + " " + d.latitude);
+  }).join(join);
+
+  var wkt = start + middle + end;
+  console.log(wkt);
+  return wkt;
+};
+
 AutocompleteDirectionsHandler.prototype.route = function() {
   if (!this.originPlaceId || !this.destinationPlaceId) {
     return;
   }
   var me = this;
 
-  this.directionsService.route({
-    origin: {'placeId': this.originPlaceId},
-    destination: {'placeId': this.destinationPlaceId},
-    travelMode: this.travelMode,
-    provideRouteAlternatives: true
-  }, function(response, status) {
+  var myspecialfunction = function(response, status) {
     if (status === 'OK') {
       me.directionsDisplay.setDirections(response);
-      //console.log('display:',me.directionsDisplay);
-      //// Convert polyline into points and put into one array
-      //console.log(me.directionsDisplay.directions.routes.length);
-      var route_wktstring = [];
-      var start = "LINESTRING(";
-      var end = ")";
-      var join = ", ";
-      // create a function to convert route codes into well-known texts
-      var wkt_conversion = function(route){
-        route_decoded = decode(route.overview_polyline);
-        middle = _.map(route_decoded,function(d){
-          return (d.longitude + " " + d.latitude);}).join(join);
-          wkt = start + middle + end; // well known text line string
-        route_wktstring.push(wkt);
-      };
-      _.each(me.directionsDisplay.directions.routes,wkt_conversion);
-      console.log('route_wktstring.length',route_wktstring.length);
-      //// carto SQL query desired rows
+
+      var route_wktstrings = _.map(me.directionsDisplay.directions.routes, wkt_conversion);
+
       var scoreArray = [];
-      var getRouteScore = function(wktstring){
-        var cartoUserName = 'KristenZhao';
-        var sql = 'select * from allscore_length as L where ST_DWithin(ST_GeomFromText(\'' +
-        wktstring + '\')::geography,st_centroid(L.the_geom)::geography,5)';
-        var format = "GeoJSON";
-        var url = "https://"+cartoUserName+".carto.com/api/v2/sql?format="+format+"&q="+sql;
-        console.log('sql:',sql);
-        // Start query and score calculation
-        $.ajax(url).done(function(data){
-          console.log('data:',data);
-          console.log('length:',data.features[0].properties.lengthft);
-          var sumlength = _.reduce(data.features, function(memo,i) {
-            return memo+i.properties.lengthft;}, 0);
-          _.each(data.features, function(iteratee){
-            iteratee.properties.weightedScore =
-            Math.round(iteratee.properties.lengthft/sumlength*iteratee.properties.finalscore);
-          });
-          // console.log('weightedScore:',weightedScore);
-          var avgscore = _.reduce(data.features, function(memo,i){
-            return memo+i.properties.weightedScore;}, 0);
-          // console.log('sumlength',sumlength);
-          console.log('data length',data.features.length);
-          console.log('avgscore',avgscore);
-          scoreArray.push(avgscore);
-          return avgscore;
-        });
-      };
-    _.each(route_wktstring,getRouteScore);
-     //setTimeout(function(){console.log(scoreArray)},2000);
-     console.log(scoreArray[1]);
-     console.log(me.directionsDisplay.directions.routes[0].summary);
-     console.log(me.directionsDisplay.directions.routes[0].legs[0].distance.text);
+      getRouteScore(route_wktstrings, scoreArray);
 
      //Setting direction display
      setTimeout(function(){
@@ -158,5 +148,13 @@ AutocompleteDirectionsHandler.prototype.route = function() {
       else {
       window.alert('Directions request failed due to ' + status);
     }
-  });
+  };
+
+  this.directionsService.route({
+    origin: {'placeId': this.originPlaceId},
+    destination: {'placeId': this.destinationPlaceId},
+    travelMode: this.travelMode,
+    provideRouteAlternatives: true
+  }, myspecialfunction);
+
 };
