@@ -97,42 +97,44 @@ AutocompleteDirectionsHandler.prototype.route = function() {
         }, 0);
         console.log('avgscore',avgscore);
         //// assign scores to panels
-        $(".sidenav").append(
-          "<div class='route-option'>" +
-            "<div class='mdl-grid--no-spacing'>" +
-              "<div class='mdl-cell mdl-cell--12-col'>" +
-                "<h6 class='route-title'>" +
-                  'via '.concat(me.directionsDisplay.directions.routes[idx].summary) +
-                '</h6>'+
-              '</div>' +
-            '</div>' +
-            "<div class='mdl-grid'>" +
-              "<div class='mdl-cell mdl-cell--2-col'>" +
-                "<i class='fa fa-bicycle' aria-hidden='true'></i>" +
-              '</div>' +
-              '<div class="mdl-cell mdl-cell--5-col">' +
-              me.directionsDisplay.directions.routes[idx].legs[0].distance.text +
-              '</div>' +
-              '<div class="mdl-cell mdl-cell--5-col">' +
-              me.directionsDisplay.directions.routes[idx].legs[0].duration.text +
-              '</div>' +
-            '</div>' +
-          '<div class="mdl-grid--no-spacing">' +
-            '<div class="mdl-cell mdl-cell--12-col">' +
-              "<h4 class='route-title'>" +
-                avgscore +
-              '</h4>' +
-            "</div>" +
-          "</div>" +
-        '</div>'
-        );
+          $(".sidenav").append(
+            "<div class='route-option'>" +
+                "<div class='mdl-grid--no-spacing'>" +
+                  "<div class='mdl-cell mdl-cell--12-col'>" +
+                    "<h6 class='route-title'>" +
+                      'via '.concat(me.directionsDisplay.directions.routes[idx].summary) +
+                    '</h6>'+
+                  '</div>' +
+                '</div>' +
+                "<div class='mdl-grid'>" +
+                  "<div class='mdl-cell mdl-cell--2-col'>" +
+                    "<i class='fa fa-bicycle' aria-hidden='true'></i>" +
+                  '</div>' +
+                  '<div class="mdl-cell mdl-cell--3-col">' +
+                  me.directionsDisplay.directions.routes[idx].legs[0].distance.text +
+                  '</div>' +
+                  '<div class="mdl-cell mdl-cell--3-col">' +
+                  me.directionsDisplay.directions.routes[idx].legs[0].duration.text +
+                  '</div>' +
+                '</div>' +
+              '<div class="mdl-grid--no-spacing">' +
+                '<div class="mdl-cell mdl-cell--12-col">' +
+                  "<h4 class='route-title'>" +
+                    avgscore +
+                  '</h4>' +
+                "</div>" +
+              "</div>" +
+            '</a>' +
+          '</div>'
+          );
+        });
       });
-    });
-  };
+    };
 
   var route_analyze = function(response, status) {
     if (status === 'OK') {
       me.directionsDisplay.setDirections(response);
+      console.log('routes',me.directionsDisplay.directions.routes);
       var route_wktstring = _.map(me.directionsDisplay.directions.routes,wkt_conversion);
       console.log('route_wktstring',route_wktstring);
       var urls = _.map(route_wktstring,get_url);

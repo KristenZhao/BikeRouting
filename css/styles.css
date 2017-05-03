@@ -37,9 +37,9 @@ html, body {
   padding: 16px 10px;
   font-family: Roboto;
 }
- .sidenav a:hover, .offcanvas a:focus{
-     color: #f1f1f1;
- }
+ /*.sidenav a:hover, .offcanvas a:focus{
+     color: #aaaaaa;
+ }*/
 
  .sidenav .closebtn {
      position: absolute;
@@ -108,8 +108,12 @@ html, body {
   margin: 12px;
   position: static;
   clear: both;
+  cursor: pointer;
 }
 
+.route-option:hover {
+  background:#4DB6AC;
+}
 .route-title {
   margin: 8px 8px 16px;
 }
