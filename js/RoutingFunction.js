@@ -1,6 +1,4 @@
 // Load the google map
-//<script>
-
 var map;
 function initMap() {
   map = new google.maps.Map(document.getElementById('map'), {
@@ -9,12 +7,8 @@ function initMap() {
   });
   new AutocompleteDirectionsHandler(map);
 }
-// hide route option panels
-$( "#option1" ).hide();
-$( "#option2" ).hide();
-$( "#option3" ).hide();
 
-//</script>
+// autocomplete function
 function AutocompleteDirectionsHandler(map) {
   this.map = map;
   this.originPlaceId = null;
@@ -51,7 +45,6 @@ AutocompleteDirectionsHandler.prototype.setupPlaceChangedListener = function(aut
     }
     me.route();
   });
-
 };
 
 // variables for creating a WKT
@@ -60,12 +53,11 @@ var wkt_conversion = function(route){
   var start = "LINESTRING(";
   var end = ")";
   var join = ", ";
-  route_decoded = decode(route.overview_polyline);
-  middle = _.map(route_decoded,function(d) {
+  var route_decoded = decode(route.overview_polyline);
+  var middle = _.map(route_decoded,function(d) {
     return (d.longitude + " " + d.latitude);
   }).join(join);
-    wkt = start + middle + end; // well known text line string
-  // route_wktstring.push(wkt);
+  var wkt = start + middle + end; // well known text line string
   return wkt;
 };
 
@@ -73,15 +65,15 @@ var wkt_conversion = function(route){
 var get_url = function(wkt){
   var sql = 'select * from allscore_length as L where ST_DWithin(ST_GeomFromText(\'' +
   wkt + '\')::geography,st_centroid(L.the_geom)::geography,5)';
-  var url = "https://KristenZhao.carto.com/api/v2/sql?format=GeoJSON&q="+sql;
-  return url;
+  return "https://KristenZhao.carto.com/api/v2/sql?format=GeoJSON&q="+sql;
 };
 //// carto SQL query desired rows
 var getRouteScore = function(urls){
-  $(urls).each(function(url){
-    var scoreArray = [];
+  $(urls).each(function(idx,url){
+    console.log('idx',idx);
     // Start query and score calculation
     $.getJSON(url).done(function(data){
+      console.log('data',data);
       var sumlength = _.reduce(data.features, function(memo,i) {
         return memo+i.properties.lengthft;
       }, 0);
@@ -93,25 +85,65 @@ var getRouteScore = function(urls){
         return memo+i.properties.weightedScore;
       }, 0);
       console.log('avgscore',avgscore);
-      scoreArray.push(avgscore);
+      // scoreArray.push(avgscore);
+      // console.log('scoreArray',scoreArray);
+      // return avgscore;
+      //// assign scores to panels
+      $(".route-option").append(
+        '<div class="mdl-grid--no-spacing">' +
+          '<div class="mdl-cell mdl-cell--12-col">' +
+            "<h4 class='route-title'>" +
+              avgscore +
+            '</h4>' +
+          "</div>" +
+        "</div>"
+      );
     });
   });
 };
-
-
 
 AutocompleteDirectionsHandler.prototype.route = function() {
   if (!this.originPlaceId || !this.destinationPlaceId) {
     return;
   }
+  // hide route option panels
+  $(".route-option").hide();
+
   var me = this;
+
+  var displayRouteInfo = function(route){
+    $(".sidenav").append(
+      "<div class='route-option'>" +
+        "<div class='mdl-grid--no-spacing'>" +
+          "<div class='mdl-cell mdl-cell--12-col'>" +
+            "<h6 class='route-title'>" +
+              'via '.concat(route.summary) +
+            '</h6>'+
+          '</div>' +
+        '</div>' +
+        "<div class='mdl-grid'>" +
+          "<div class='mdl-cell mdl-cell--2-col'>" +
+            "<i class='fa fa-bicycle' aria-hidden='true'></i>" +
+          '</div>' +
+          '<div class="mdl-cell mdl-cell--5-col">' +
+          'mile' +
+          '</div>' +
+          '<div class="mdl-cell mdl-cell--5-col">' +
+          'time' +
+          '</div>' +
+        '</div>' +
+      '</div>');
+  };
+
   var route_analyze = function(response, status) {
     if (status === 'OK') {
       me.directionsDisplay.setDirections(response);
       var route_wktstring = _.map(me.directionsDisplay.directions.routes,wkt_conversion);
+      console.log('route_wktstring',route_wktstring);
       var urls = _.map(route_wktstring,get_url);
+      console.log('urls',urls);
+      _.each(me.directionsDisplay.directions.routes,displayRouteInfo);
       getRouteScore(urls);
-      console.log('scoreArray',scoreArray);
      }
      else {
      window.alert('Directions request failed due to ' + status);
@@ -157,7 +189,4 @@ AutocompleteDirectionsHandler.prototype.route = function() {
     //      $(options2).hide();
     //    }
     //  });
-
-
-    // } //// Error handling:
 };
