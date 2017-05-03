@@ -67,40 +67,7 @@ var get_url = function(wkt){
   wkt + '\')::geography,st_centroid(L.the_geom)::geography,5)';
   return "https://KristenZhao.carto.com/api/v2/sql?format=GeoJSON&q="+sql;
 };
-//// carto SQL query desired rows
-var getRouteScore = function(urls){
-  $(urls).each(function(idx,url){
-    console.log('idx',idx);
-    // Start query and score calculation
-    $.getJSON(url).done(function(data){
-      console.log('data',data);
-      var sumlength = _.reduce(data.features, function(memo,i) {
-        return memo+i.properties.lengthft;
-      }, 0);
-      _.each(data.features, function(iteratee){
-        iteratee.properties.weightedScore =
-        Math.round(iteratee.properties.lengthft/sumlength*iteratee.properties.finalscore);
-      });
-      var avgscore = _.reduce(data.features, function(memo,i){
-        return memo+i.properties.weightedScore;
-      }, 0);
-      console.log('avgscore',avgscore);
-      // scoreArray.push(avgscore);
-      // console.log('scoreArray',scoreArray);
-      // return avgscore;
-      //// assign scores to panels
-      $(".route-option").append(
-        '<div class="mdl-grid--no-spacing">' +
-          '<div class="mdl-cell mdl-cell--12-col">' +
-            "<h4 class='route-title'>" +
-              avgscore +
-            '</h4>' +
-          "</div>" +
-        "</div>"
-      );
-    });
-  });
-};
+
 
 AutocompleteDirectionsHandler.prototype.route = function() {
   if (!this.originPlaceId || !this.destinationPlaceId) {
@@ -111,28 +78,56 @@ AutocompleteDirectionsHandler.prototype.route = function() {
 
   var me = this;
 
-  var displayRouteInfo = function(route){
-    $(".sidenav").append(
-      "<div class='route-option'>" +
-        "<div class='mdl-grid--no-spacing'>" +
-          "<div class='mdl-cell mdl-cell--12-col'>" +
-            "<h6 class='route-title'>" +
-              'via '.concat(route.summary) +
-            '</h6>'+
-          '</div>' +
-        '</div>' +
-        "<div class='mdl-grid'>" +
-          "<div class='mdl-cell mdl-cell--2-col'>" +
-            "<i class='fa fa-bicycle' aria-hidden='true'></i>" +
-          '</div>' +
-          '<div class="mdl-cell mdl-cell--5-col">' +
-          'mile' +
-          '</div>' +
-          '<div class="mdl-cell mdl-cell--5-col">' +
-          'time' +
-          '</div>' +
-        '</div>' +
-      '</div>');
+  //// carto SQL query desired rows
+  var getRouteScore = function(urls){
+    $(urls).each(function(idx,url){
+      console.log('idx',idx);
+      // Start query and score calculation
+      $.getJSON(url).done(function(data){
+        console.log('data',data);
+        var sumlength = _.reduce(data.features, function(memo,i) {
+          return memo+i.properties.lengthft;
+        }, 0);
+        _.each(data.features, function(iteratee){
+          iteratee.properties.weightedScore =
+          Math.round(iteratee.properties.lengthft/sumlength*iteratee.properties.finalscore);
+        });
+        var avgscore = _.reduce(data.features, function(memo,i){
+          return memo+i.properties.weightedScore;
+        }, 0);
+        console.log('avgscore',avgscore);
+        //// assign scores to panels
+        $(".sidenav").append(
+          "<div class='route-option'>" +
+            "<div class='mdl-grid--no-spacing'>" +
+              "<div class='mdl-cell mdl-cell--12-col'>" +
+                "<h6 class='route-title'>" +
+                  'via '.concat(me.directionsDisplay.directions.routes[idx].summary) +
+                '</h6>'+
+              '</div>' +
+            '</div>' +
+            "<div class='mdl-grid'>" +
+              "<div class='mdl-cell mdl-cell--2-col'>" +
+                "<i class='fa fa-bicycle' aria-hidden='true'></i>" +
+              '</div>' +
+              '<div class="mdl-cell mdl-cell--5-col">' +
+              me.directionsDisplay.directions.routes[idx].legs[0].distance.text +
+              '</div>' +
+              '<div class="mdl-cell mdl-cell--5-col">' +
+              me.directionsDisplay.directions.routes[idx].legs[0].duration.text +
+              '</div>' +
+            '</div>' +
+          '<div class="mdl-grid--no-spacing">' +
+            '<div class="mdl-cell mdl-cell--12-col">' +
+              "<h4 class='route-title'>" +
+                avgscore +
+              '</h4>' +
+            "</div>" +
+          "</div>" +
+        '</div>'
+        );
+      });
+    });
   };
 
   var route_analyze = function(response, status) {
@@ -142,7 +137,6 @@ AutocompleteDirectionsHandler.prototype.route = function() {
       console.log('route_wktstring',route_wktstring);
       var urls = _.map(route_wktstring,get_url);
       console.log('urls',urls);
-      _.each(me.directionsDisplay.directions.routes,displayRouteInfo);
       getRouteScore(urls);
      }
      else {
@@ -156,37 +150,4 @@ AutocompleteDirectionsHandler.prototype.route = function() {
     travelMode: this.travelMode,
     provideRouteAlternatives: true
   }, route_analyze);
-
-     //Setting direction display
-    //  setTimeout(function(){
-    //    for(i=0; i< me.directionsDisplay.directions.routes.length;i++){
-    //      var num = i+1;
-    //      var options = '#option'.concat(num.toString());
-    //     //  console.log('num:',num);
-    //     //  console.log('option'.concat(num.toString()));
-    //      $(options).show();
-    //      $(options.concat(' h6')).text(
-    //        ('via '.concat(me.directionsDisplay.directions.routes[i].summary))
-    //      );
-    //      $(options.concat(' > div.mdl-grid > div:nth-child(2)')).text(
-    //        me.directionsDisplay.directions.routes[i].legs[0].distance.text
-    //      );
-    //      $(options.concat(' > div.mdl-grid > div:nth-child(3)')).text(
-    //        me.directionsDisplay.directions.routes[i].legs[0].duration.text
-    //      );
-    //      $(options.concat(' > div:nth-child(3) > div > h4')).text(
-    //        scoreArray[i].toString()
-    //      );
-    //     // asynchro
-    //    }
-    //  },4000);
-     // set event listener
-    //  $('.controls').on('click',function(e){
-    //    for(i=0; i< me.directionsDisplay.directions.routes.length;i++){
-    //      var num = i+1;
-    //      var options2 = '#option'.concat(num.toString());
-    //      //console.log(options2);
-    //      $(options2).hide();
-    //    }
-    //  });
 };
