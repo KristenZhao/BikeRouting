@@ -74,14 +74,14 @@ AutocompleteDirectionsHandler.prototype.route = function() {
     return;
   }
   // hide route option panels
-  $(".route-option").hide();
+  $(".route-option").remove();
 
   var me = this;
 
   //// carto SQL query desired rows
-  var getRouteScore = function(urls){
+  var getRouteScore = function(response,urls){
     $(urls).each(function(idx,url){
-      console.log('idx',idx);
+      // console.log('idx',idx);
       // Start query and score calculation
       $.getJSON(url).done(function(data){
         console.log('data',data);
@@ -98,7 +98,7 @@ AutocompleteDirectionsHandler.prototype.route = function() {
         console.log('avgscore',avgscore);
         //// assign scores to panels
           $(".sidenav").append(
-            "<div class='route-option'>" +
+            "<div class='route-option' id='route" + idx + "'>" +
                 "<div class='mdl-grid--no-spacing'>" +
                   "<div class='mdl-cell mdl-cell--12-col'>" +
                     "<h6 class='route-title'>" +
@@ -110,13 +110,13 @@ AutocompleteDirectionsHandler.prototype.route = function() {
                   "<div class='mdl-cell mdl-cell--2-col'>" +
                     "<i class='fa fa-bicycle' aria-hidden='true'></i>" +
                   '</div>' +
-                  '<div class="mdl-cell mdl-cell--3-col">' +
-                  me.directionsDisplay.directions.routes[idx].legs[0].distance.text +
-                  '</div>' +
-                  '<div class="mdl-cell mdl-cell--3-col">' +
-                  me.directionsDisplay.directions.routes[idx].legs[0].duration.text +
-                  '</div>' +
+                '<div class="mdl-cell mdl-cell--3-col">' +
+                me.directionsDisplay.directions.routes[idx].legs[0].distance.text +
                 '</div>' +
+                '<div class="mdl-cell mdl-cell--3-col">' +
+                me.directionsDisplay.directions.routes[idx].legs[0].duration.text +
+                '</div>' +
+              '</div>' +
               '<div class="mdl-grid--no-spacing">' +
                 '<div class="mdl-cell mdl-cell--12-col">' +
                   "<h4 class='route-title'>" +
@@ -124,9 +124,16 @@ AutocompleteDirectionsHandler.prototype.route = function() {
                   '</h4>' +
                 "</div>" +
               "</div>" +
-            '</a>' +
-          '</div>'
+            '</div>'
           );
+          $("#route"+idx).click(function(){
+            // console.log('previous renderer',google.maps.DirectionsRenderer);
+            console.log('click fired for route',idx);
+            // return idx;
+            // this.directionsDisplay = null;
+            console.log('directionsDisplay',me.directionsDisplay);
+            me.directionsDisplay.routeIndex = idx;
+          });
         });
       });
     };
@@ -134,12 +141,12 @@ AutocompleteDirectionsHandler.prototype.route = function() {
   var route_analyze = function(response, status) {
     if (status === 'OK') {
       me.directionsDisplay.setDirections(response);
-      console.log('routes',me.directionsDisplay.directions.routes);
+
       var route_wktstring = _.map(me.directionsDisplay.directions.routes,wkt_conversion);
       console.log('route_wktstring',route_wktstring);
       var urls = _.map(route_wktstring,get_url);
       console.log('urls',urls);
-      getRouteScore(urls);
+      getRouteScore(response,urls);
      }
      else {
      window.alert('Directions request failed due to ' + status);
