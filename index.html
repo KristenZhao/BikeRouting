@@ -13,33 +13,34 @@
     <link rel='stylesheet' href='css/font-awesome.min.css' />
   </head>
   <body>
-    <div id="mySidenav" class="sidenav">
-      <span>Find your BEST Route</span>
-      <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
-        <div id='oi-controls'>
-          <input id="origin-input" class="controls" type="text"
-          placeholder="Enter an origin location">
-          <input id="destination-input" class="controls" type="text"
-              placeholder="Enter a destination location">
-        </div>
-        <!-- Three Route Option Panels -->
-        <div class='route-option'>
-        </div>
-    </div>
     <!-- Always shows a header, even in smaller screens. -->
       <header id='main'>
           <span style="font-size:24px; cursor:pointer; color:#eeeeee;" onclick="openNav()">&#9776;</span>
           <!-- Title -->
           <span style="font-size:24px;font-family:Roboto;color:#EEEEEE;">Bike Smart</span>
           <!-- Add spacer, to align navigation to the right -->
-          <!-- <div class="mdl-layout-spacer"></div> -->
+          <div class="mdl-layout-spacer"></div>
           <!-- Navigation. We hide it in small screens. -->
+          <button type="button" class="mdl-button show-modal">Learn More</button>
           <nav class="mdl-navigation mdl-layout--large-screen-only">
             <a class="mdl-navigation__link" href="https://github.com/KristenZhao/BikeRouting/" target="_blank">
               <i class="fa fa-github fa-2x" aria-hidden="true"></i>
             </a>
           </nav>
       </header>
+      <div id="mySidenav" class="sidenav">
+        <span>Find your BEST Route</span>
+        <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
+          <div id='oi-controls'>
+            <input id="origin-input" class="controls" type="text"
+            placeholder="Enter an origin location">
+            <input id="destination-input" class="controls" type="text"
+                placeholder="Enter a destination location">
+          </div>
+          <!-- Three Route Option Panels -->
+          <div class='route-option'>
+          </div>
+      </div>
       <div id="map"></div>
     <script src='js/motionFunctions.js'></script>
     <script src='js/jquery-2.2.0.js'></script>

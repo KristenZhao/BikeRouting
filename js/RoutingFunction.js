@@ -127,12 +127,13 @@ AutocompleteDirectionsHandler.prototype.route = function() {
             '</div>'
           );
           $("#route"+idx).click(function(){
-            // console.log('previous renderer',google.maps.DirectionsRenderer);
             console.log('click fired for route',idx);
-            // return idx;
-            // this.directionsDisplay = null;
-            console.log('directionsDisplay',me.directionsDisplay);
-            me.directionsDisplay.routeIndex = idx;
+            me.directionsDisplay.setMap(null);
+            me.directionsDisplay = new google.maps.DirectionsRenderer({
+              map: map,
+              directions: response,
+              routeIndex: idx
+            });
           });
         });
       });
