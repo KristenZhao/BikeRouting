@@ -119,7 +119,7 @@ AutocompleteDirectionsHandler.prototype.route = function() {
               '</div>' +
               '<div class="mdl-grid--no-spacing">' +
                 '<div class="mdl-cell mdl-cell--12-col">' +
-                  "<h4 class='route-title'>" +
+                  "<h4 class='route-title'>Score " +
                     avgscore +
                   '</h4>' +
                 "</div>" +
